@@ -61,7 +61,7 @@ spec:
     spec:
       containers:
       - name: hn
-        image: tylerflint/hacker-news-clone-node:latest
+        image: tylerflint/hacker-news-clone-node:v2
         env:
         ports:
         - containerPort: 3000
