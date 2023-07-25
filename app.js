@@ -3,10 +3,10 @@ var app = express();
 var request = require('request');
 var bodyParser = require('body-parser');
 var flash = require('connect-flash');
-var mongoose = require('mongoose'),
-    passport = require('passport');
-var localStrategy = require("passport-local");
-var passportLocalMongoose = require("passport-local-mongoose");
+// var mongoose = require('mongoose'),
+//     passport = require('passport');
+// var localStrategy = require("passport-local");
+// var passportLocalMongoose = require("passport-local-mongoose");
 var timediff = require('timediff');
 
 var time_format = {
@@ -27,18 +27,19 @@ var time_format = {
 // requiring routes
 
 //requiring models
-var User = require('./models/user');
-var History = require('./models/history');
+// var User = require('./models/user');
+// var History = require('./models/history');
 
-var authRoutes = require('./routes/auth.js');
+// var authRoutes = require('./routes/auth.js');
 // var middleware =/ require('./middleware');
 
 // mongoose.connect("mongodb://localhost:27017/hacker_news",{ useNewUrlParser: true});
-var mongoDB = 'mongodb://kriti09:rachana123@ds349175.mlab.com:49175/hacker-news';
-mongoose.connect(mongoDB);
-mongoose.Promise = global.Promise;
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// var mongoDB = 'mongodb://kriti09:rachana123@ds349175.mlab.com:49175/hacker-news';
+// var mongoDB = 'mongodb+srv://tylerflint:awsAYUH9SlhJeSN9@sandbox.6hyz2t5.mongodb.net/?retryWrites=true&w=majority'
+// mongoose.connect(mongoDB);
+// mongoose.Promise = global.Promise;
+// var db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -50,14 +51,14 @@ app.use(require("express-session")({
     resave: false,
     saveUninitialized: false
  }));
- app.use(passport.initialize());
- app.use(passport.session());
- passport.use(new localStrategy(User.authenticate()));
- passport.serializeUser(User.serializeUser());
- passport.deserializeUser(User.deserializeUser());
+//  app.use(passport.initialize());
+//  app.use(passport.session());
+//  passport.use(new localStrategy(User.authenticate()));
+//  passport.serializeUser(User.serializeUser());
+//  passport.deserializeUser(User.deserializeUser());
  
  app.use(function(req, res, next){
-    res.locals.currentUser = req.user;
+    // res.locals.currentUser = req.user;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     var  date = new Date();
@@ -66,9 +67,9 @@ app.use(require("express-session")({
  })
 
 
-app.use("/", authRoutes);
+// app.use("/", authRoutes);
 
-app.get('/',isLoggedIn, function(req, res){
+app.get('/', function(req, res){
     // if(req.query.query){
     //     res.redirect('/save_history');
     // };
@@ -79,22 +80,7 @@ app.get('/',isLoggedIn, function(req, res){
     var by = req.query.by || 'popularity';  
     var dateRange = req.query.dateRange || 'all';
     var X ;
-    if(req.query.query){
-        // User.findOne({_id: req.user._id}, ) 
-        User.findOne({_id: req.user._id}, function(err, user){
-            if(user.history.length >= 5){
-                // console.log(user);
-                // console.log(user.history.length);
-                // console.log(user);
-                user.history.shift();
-                user.save();
-                // console.log(user);
-            };
-            user.history.push({query:query, tag:tag, by:by, dateRange:dateRange});
-            user.save();
-        });
         
-    }
     if(dateRange == 'all'){
         X=0;
     }else{
@@ -155,17 +141,17 @@ app.get('/comments/:id', function(req, res){
         }
     }) 
 });
-app.get('/history', function(req, res){
-    User.findOne({_id: req.user._id}, function(err, user){
-        if(err){
-            console.log(err);
-        }else{
-            var history = user.history;
-            res.render('history' ,{history: history, timediff:timediff, time_format:time_format});
-        }
-    });
+// app.get('/history', function(req, res){
+//     User.findOne({_id: req.user._id}, function(err, user){
+//         if(err){
+//             console.log(err);
+//         }else{
+//             var history = user.history;
+//             res.render('history' ,{history: history, timediff:timediff, time_format:time_format});
+//         }
+//     });
     
-});
+// });
 
 function isLoggedIn(req, res, next){
     if( req.isAuthenticated() ){
@@ -179,7 +165,9 @@ app.get("*", function(req, res){
 	res.send("PAGE NOT FOUND!!");
 });
 
-app.listen(process.env.PORT || 3000, function(){
-    console.log("Server Connected!!");
+const port = process.env.PORT || 3000
+
+app.listen(port, function(){
+    console.log(`Listening on http://127.0.0.1:${port}`);
 });
 
