@@ -24,6 +24,11 @@ var time_format = {
     callback: null
   }
 
+var endpoint = process.env.ENDPOINT || 'https://hn.algolia.com'
+
+console.log(`Using endpoint: ${endpoint}`)
+
+
 // requiring routes
 
 //requiring models
@@ -100,9 +105,9 @@ app.get('/', function(req, res){
     // };
     
     if(by== 'date'){
-        var url = 'https://hn.algolia.com/api/v1/search_by_date?query='+query+'&tags='+tag+'&numericFilters=created_at_i>'+X+'&page='+page;    
+        var url = `${endpoint}/api/v1/search_by_date?query=`+query+'&tags='+tag+'&numericFilters=created_at_i>'+X+'&page='+page;    
     }else{
-        var url = 'https://hn.algolia.com/api/v1/search?query='+query+'&tags='+tag+'&numericFilters=created_at_i>'+X+'&page='+page;
+        var url = `${endpoint}/api/v1/search?query=`+query+'&tags='+tag+'&numericFilters=created_at_i>'+X+'&page='+page;
     }
     request(url, function(err,  response, body){
         if(err)
@@ -128,7 +133,7 @@ app.get('/', function(req, res){
         // console.log(data);
 });
 app.get('/comments/:id', function(req, res){
-    var url = 'http://hn.algolia.com/api/v1/items/'+req.params.id;
+    var url = `${endpoint}/api/v1/items/`+req.params.id;
     request(url, function(err,  response, body){
         if(err)
             console.log(err);

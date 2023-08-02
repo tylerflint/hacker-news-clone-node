@@ -1,70 +1,72 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: hn-ingress
+  name: qtap-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   tls:
   - hosts:
-    - hn.qpoint.io
-    secretName: hn-tls
+    - qtap-sandbox.qpoint.io
+    secretName: qtap-tls
   defaultBackend: 
     service:
-      name: hn
+      name: qtap
       port:
         number: 80
   rules:
-  - host: hn.qpoint.io
+  - host: qtap-sandbox.qpoint.io
     http:
         paths:
         - pathType: Prefix
           path: "/"
           backend:
             service:
-              name: hn
+              name: qtap
               port:
                 number: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: hn
+  name: qtap
 spec:
   selector:
-    app: hn
+    app: qtap
   ports:
     - port: 80
       protocol: TCP
-      targetPort: 3000
+      targetPort: 3333
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hn-deployment
+  name: qtap-deployment
   labels:
-    app: hn
+    app: qtap
 spec:
-  replicas: 3
+  replicas: 1
   strategy:
     rollingUpdate:
       maxUnavailable: 0
       maxSurge: 1
   selector:
     matchLabels:
-      app: hn
+      app: qtap
   template:
     metadata:
       labels:
-        app: hn
+        app: qtap
     spec:
       containers:
-      - name: hn
-        image: tylerflint/hacker-news-clone-node:v4
+      - name: qtap
+        image: tylerflint/qtap:v3
         env:
-        - name: ENDPOINT
-          value: "http://qtap.qtap.svc.cluster.local"
+        - name: TOKEN
+          value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IlFVZlpxRXlsZHNMZ01jZ056aW40IiwiZGVzdGluYXRpb25JZCI6ImtpTkFjcW1hV1REQk9GcDJVbE9xIiwicm9sZSI6InF0YXAiLCJpYXQiOjE2OTA1ODI2OTIsImV4cCI6MTc3Njg5NjI5Mn0._Ma5L6YcSIAuxdvl_iuWPkw7umZ6ANFmfzFwPo6O3NM"
+        - name: LISTEN
+          value: "0.0.0.0:3333"
         ports:
         - containerPort: 3000
 
@@ -79,5 +81,5 @@ spec:
                   - key: app
                     operator: NotIn 
                     values:
-                    - hn
+                    - qtap
                 topologyKey: kubernetes.io/hostname
